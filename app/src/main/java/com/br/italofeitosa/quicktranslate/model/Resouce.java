@@ -3,11 +3,15 @@ package com.br.italofeitosa.quicktranslate.model;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * @author italofeitosa on 14/06/17.
  */
 public class Resouce  extends RealmObject{
+
+    @PrimaryKey
+    private long id;
 
     private Date createdAt;
 
@@ -22,6 +26,14 @@ public class Resouce  extends RealmObject{
     private String languageId;
 
     private String userModified;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public Date getCreatedAt() {
         return createdAt;
