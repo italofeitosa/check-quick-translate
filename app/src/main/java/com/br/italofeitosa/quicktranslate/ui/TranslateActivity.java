@@ -1,18 +1,25 @@
-package com.br.italofeitosa.quicktranslate;
+package com.br.italofeitosa.quicktranslate.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.br.italofeitosa.quicktranslate.Application;
+import com.br.italofeitosa.quicktranslate.R;
+
+/**
+ * @author italofeitosa on 14/06/17.
+ */
 public class TranslateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((Application) getApplication()).component().inject(TranslateActivity.this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translate);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

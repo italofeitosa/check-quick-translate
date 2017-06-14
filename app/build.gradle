@@ -1,10 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "italofeitosa.com.br.check_quick_translate"
+        applicationId "com.br.italofeitosa.quicktranslate"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -15,6 +16,18 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        development {
+            buildConfigField 'String', 'URL_REQUEST', '"http://192.168.25.119:3001/"'
+            return true
+        }
+
+        production {
+            buildConfigField 'String', 'URL_REQUEST', '" http://portal.greenmilesoftware.com/"'
+            return true
         }
     }
 }
@@ -28,4 +41,10 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    compile 'com.google.dagger:dagger:2.10'
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
 }
