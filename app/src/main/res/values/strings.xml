@@ -3,5 +3,6 @@
     <string name="action_settings">Settings</string>
 
     <string name="connection">Sem Conexão</string>
-    <string name="search_title">Contém</string>
+    <string name="search_hint">Contém...</string>
+    <string name="search_title">Pesquisar...</string>
 </resources>

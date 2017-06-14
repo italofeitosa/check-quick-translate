@@ -48,6 +48,7 @@ public class TranslateActivity extends AppCompatActivity {
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
