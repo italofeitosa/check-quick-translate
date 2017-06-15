@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="italofeitosa.com.br.check_quick_translate.TranslateActivity">
+    tools:context="com.br.italofeitosa.quicktranslate.ui.TranslateActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,7 +20,17 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_translate" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvContacts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:divider="@color/list_divider"
+        android:dividerHeight="1dp"
+        tools:listitem="@layout/content_item_resource"/>
+
+   <!-- <include layout="@layout/content_translate" />-->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

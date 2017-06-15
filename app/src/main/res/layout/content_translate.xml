@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="italofeitosa.com.br.check_quick_translate.TranslateActivity"
+    tools:context="com.br.italofeitosa.quicktranslate.ui.TranslateActivity"
     tools:showIn="@layout/activity_translate">
 
     <TextView

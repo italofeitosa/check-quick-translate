@@ -1,4 +1,9 @@
 <resources>
     <dimen name="fab_margin">48dp</dimen>
     <dimen name="fab_margin_right">16dp</dimen>
+
+    <!-- Dimens related to list of clinics -->
+    <dimen name="resource">17dp</dimen>
+    <dimen name="update">15dip</dimen>
+    <dimen name="value">17dip</dimen>
 </resources>
