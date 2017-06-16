@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -120,7 +121,6 @@ public class TranslateActivity extends AppCompatActivity {
                         String jsonValue = jsonElement.getAsJsonObject().get("resource").getAsString();
                         ResourceTO resourceTO = gson.fromJson(jsonValue, ResourceTO.class);
                         resourceTOList.add(resourceTO);*/
-
                         ResourceTO resourceTO = gson.fromJson(response.body().get(i).getAsJsonObject().get("resource"), ResourceTO.class);
                         resourceTOList.add(resourceTO);
                     }
@@ -149,9 +149,11 @@ public class TranslateActivity extends AppCompatActivity {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
+
+
                 for(int i=0; i < resourceTOList.size(); i++) {
-                    Resource resource = new Resource(resourceTOList.get(i), (long) (i + 1));
-                    bgRealm.createObject(Resource.class, resource.getId());
+                    Resource resource = new Resource(resourceTOList.get(i), (long) i + 1);
+                    bgRealm.copyToRealm(resource);
                 }
             }
 
@@ -168,6 +170,13 @@ public class TranslateActivity extends AppCompatActivity {
                 Toast.makeText(TranslateActivity.this, "Não foi possível salvar os dados no dispositivo", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+
+    void getResourcesList(final ProgressDialog progress) {
+        RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);
+        List<Resource> resourceList = resourceRealmQuery.findAll();
+        progress.dismiss();
     }
 
 
@@ -197,9 +206,12 @@ public class TranslateActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_language_module) {
-            Intent intent = new Intent();
+            /*Intent intent = new Intent();
             intent.setClass(TranslateActivity.this, FilterLanguageModuleActivity.class);
-            startActivity(intent);
+            startActivity(intent);*/
+            final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, "Aguarde", "Carregando os dados...", true);
+            progress.setCancelable(false);
+            getResourcesList(progress);
             return true;
         }
 
