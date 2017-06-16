@@ -1,4 +1,4 @@
-package com.br.italofeitosa.quicktranslate.retrofit;
+package com.br.italofeitosa.quicktranslate.model;
 
 import com.google.gson.annotations.SerializedName;
 

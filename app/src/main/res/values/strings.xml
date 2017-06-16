@@ -6,4 +6,9 @@
     <string name="connection">Sem Conexão</string>
     <string name="search_hint">Contém...</string>
     <string name="search_title">Pesquisar...</string>
+
+    <string name="filter_title">Filtro de Busca</string>
+    <string name="filter_message">Selecione o idioma e o Módulo para realizar as buscas</string>
+
+    <string name="ok">Ok</string>
 </resources>

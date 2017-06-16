@@ -1,7 +1,5 @@
 package com.br.italofeitosa.quicktranslate.model;
 
-import com.br.italofeitosa.quicktranslate.retrofit.ResourceTO;
-
 import java.util.ArrayList;
 import java.util.List;
 
