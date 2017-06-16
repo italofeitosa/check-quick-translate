@@ -1,7 +1,7 @@
 package com.br.italofeitosa.quicktranslate.dagger;
 
-import com.br.italofeitosa.quicktranslate.ui.TranslateActivity;
 import com.br.italofeitosa.quicktranslate.ui.SplashScreenActivity;
+import com.br.italofeitosa.quicktranslate.ui.TranslateActivity;
 
 import javax.inject.Singleton;
 

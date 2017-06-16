@@ -1,6 +1,6 @@
 package com.br.italofeitosa.quicktranslate.retrofit;
 
-import com.br.italofeitosa.quicktranslate.model.Resource;
+import com.google.gson.JsonArray;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -13,5 +13,5 @@ public interface ResourceService {
     String REQUEST = "get_resources_since";
 
     @GET(REQUEST)
-    Call<Resource> getResourcesSince();
+    Call<JsonArray> getResourcesSince();
 }

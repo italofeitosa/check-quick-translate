@@ -9,7 +9,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
  * @author italofeitosa on 15/06/17.
  */
 
-public abstract class InfiteRecyclerViewScrollListener extends RecyclerView.OnScrollListener{
+public abstract class InfiniteRecyclerViewScrollListener extends RecyclerView.OnScrollListener{
 
 
     private int visibleThreshold = 5;
@@ -24,16 +24,16 @@ public abstract class InfiteRecyclerViewScrollListener extends RecyclerView.OnSc
 
     RecyclerView.LayoutManager mLayoutManager;
 
-    public InfiteRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+    public InfiniteRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
     }
 
-    public InfiteRecyclerViewScrollListener(GridLayoutManager layoutManager) {
+    public InfiniteRecyclerViewScrollListener(GridLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
     }
 
-    public InfiteRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
+    public InfiniteRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
     }
@@ -58,12 +58,14 @@ public abstract class InfiteRecyclerViewScrollListener extends RecyclerView.OnSc
         int totalItemCount = mLayoutManager.getItemCount();
 
         if (mLayoutManager instanceof StaggeredGridLayoutManager) {
+
             int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null);
-            // get maximum element within the list
             lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
         } else if (mLayoutManager instanceof GridLayoutManager) {
+
             lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
         } else if (mLayoutManager instanceof LinearLayoutManager) {
+
             lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
         }
 

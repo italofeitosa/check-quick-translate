@@ -21,12 +21,12 @@ android {
 
     productFlavors {
         development {
-            buildConfigField 'String', 'URL_REQUEST', '"http://192.168.25.119:3001/"'
+            buildConfigField 'String', 'URL_REQUEST', '"http://portal.greenmilesoftware.com/"'
             return true
         }
 
         production {
-            buildConfigField 'String', 'URL_REQUEST', '" http://portal.greenmilesoftware.com/"'
+            buildConfigField 'String', 'URL_REQUEST', '"http://portal.greenmilesoftware.com/"'
             return true
         }
     }
@@ -47,4 +47,19 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
+}
+
+android {
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+    }
 }

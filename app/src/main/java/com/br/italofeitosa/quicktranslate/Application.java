@@ -21,6 +21,8 @@ public class Application  extends android.app.Application {
                 .appModule(new AppModule(this))
                 .networkModule(new NetworkModule())
                 .build();
+
+
     }
 
     public AppComponent component() {

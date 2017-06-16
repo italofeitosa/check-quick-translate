@@ -17,7 +17,7 @@ import java.util.TimerTask;
 /**
  * @author italofeitosa on 14/06/17.
  */
-public class SplashScreenActivity extends Activity{
+public class SplashScreenActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
