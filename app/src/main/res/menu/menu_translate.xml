@@ -13,8 +13,9 @@
     <item
         android:id="@+id/action_language_module"
         android:orderInCategory="100"
+        android:icon="@drawable/filter_outline"
         android:title="@string/action_language_module"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 
 
 </menu>
