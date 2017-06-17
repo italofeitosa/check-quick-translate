@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -20,10 +21,12 @@ public class Resource extends RealmObject{
 
     private String resourceId;
 
+    @Index
     private String moduleId;
 
     private String value;
 
+    @Index
     private String languageId;
 
     private String userModified;

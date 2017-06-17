@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +29,6 @@ import com.br.italofeitosa.quicktranslate.model.Resource;
 import com.br.italofeitosa.quicktranslate.model.ResourceTO;
 import com.br.italofeitosa.quicktranslate.retrofit.ResourceService;
 import com.br.italofeitosa.quicktranslate.ui.adaptee.ResourceAdapter;
-import com.br.italofeitosa.quicktranslate.ui.listener.InfiniteRecyclerViewScrollListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
@@ -51,8 +51,6 @@ import retrofit2.Response;
  */
 public class TranslateActivity extends AppCompatActivity {
 
-    //private static final int RESULT_LANGUAGE_MODULE = 58;
-
     @Inject
     ResourceService mResourceService;
 
@@ -65,13 +63,16 @@ public class TranslateActivity extends AppCompatActivity {
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
-    List<Resource> resourceList;
+    @BindView(R.id.rvContacts)
+    RecyclerView recyclerView;
 
     private SearchView searchView;
 
-    String queryLanguage;
+    private List<Resource> resourceList;
 
-    String queryModule;
+    private String queryLanguage;
+
+    private String queryModule;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,85 +90,51 @@ public class TranslateActivity extends AppCompatActivity {
             }
         });
 
-        infiteScrollList();
+        resourceList = getResourcesList();
+
+        infiteScrollList(resourceList);
     }
 
-    private void spinnerFilter (final List<String> languages, final List<String> modules){
 
-        Spinner languageSpinner = (Spinner) findViewById(R.id.spinerLanguage);
-        ArrayAdapter<String> languageAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, languages);
-        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        languageSpinner.setAdapter(languageAdapter);
-        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                queryLanguage = languages.get(position);
-            }
+    private void infiteScrollList(List<Resource> resources){
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        Spinner moduleSpinner = (Spinner) findViewById(R.id.spinerLanguage);
-        ArrayAdapter<String> moduleAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, modules);
-        moduleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        moduleSpinner.setAdapter(moduleAdapter);
-        moduleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                queryModule = modules.get(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-    }
-
-    private void infiteScrollList(){
-
-        RecyclerView rvItems = (RecyclerView) findViewById(R.id.rvContacts);
-        resourceList = getResourcesList(0);
-        final List<Resource> resources = this.resourceList.subList(0,10);
-        final ResourceAdapter adapter = new ResourceAdapter(resources);
-        rvItems.setAdapter(adapter);
+        ResourceAdapter adapter = new ResourceAdapter(resources);
+        recyclerView.setAdapter(adapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rvItems.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
-        InfiniteRecyclerViewScrollListener scrollListener = new InfiniteRecyclerViewScrollListener(linearLayoutManager) {
+        /*InfiniteRecyclerViewScrollListener scrollListener = new InfiniteRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, "Aguarde", "Carregando os dados...", true);
+                final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
                 progress.setCancelable(false);
                 List<Resource> moreResource = resourceList.subList(totalItemsCount,totalItemsCount + 10); //getResourcesList(resourceList.size());
                 final int curSize = adapter.getItemCount();
-                resources.addAll(moreResource);
+                resourceList.addAll(moreResource);
 
                 view.post(new Runnable() {
                     @Override
                     public void run() {
                         progress.dismiss();
-                        adapter.notifyItemRangeInserted(curSize, resources.size() - 1);
+                        adapter.notifyItemRangeInserted(curSize, resourceList.size() - 1);
                     }
                 });
             }
-        };
+        };*/
 
-        rvItems.addOnScrollListener(scrollListener);
+        //recyclerView.addOnScrollListener(scrollListener);
 
     }
 
     private void requestJsonResources (){
-        final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, "Aguarde", "Carregando os dados...", true);
+        final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
         progress.setCancelable(false);
 
         mResourceService.getResourcesSince().enqueue(new Callback<JsonArray>() {
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
                 if (response.isSuccessful()) {
-                    progress.setMessage("Salvandos os dados no dispositivo...");
+                    progress.setMessage(getString(R.string.save_message));
                     List<ResourceTO> resourceTOList = new ArrayList<>();
                     for(int i=0; i < response.body().size(); i++) {
                         ResourceTO resourceTO = gson.fromJson(response.body().get(i).getAsJsonObject().get("resource"), ResourceTO.class);
@@ -175,11 +142,8 @@ public class TranslateActivity extends AppCompatActivity {
                     }
 
                     saveResourceLocal(resourceTOList, progress);
-
-
                 } else {
                     progress.dismiss();
-
                 }
             }
 
@@ -188,7 +152,7 @@ public class TranslateActivity extends AppCompatActivity {
                 progress.dismiss();
                 t.printStackTrace();
                 Log.e("LoginError", t.getMessage() != null ? t.getMessage(): "Timeout");
-                Toast.makeText(TranslateActivity.this, "Não foi possivel carregar os dados", Toast.LENGTH_LONG).show();
+                Toast.makeText(TranslateActivity.this, getString(R.string.save_message_excption), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -198,7 +162,7 @@ public class TranslateActivity extends AppCompatActivity {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
-
+                bgRealm.delete(Resource.class);
 
                 for(int i=0; i < resourceTOList.size(); i++) {
                     Resource resource = new Resource(resourceTOList.get(i), (long) i + 1);
@@ -216,23 +180,19 @@ public class TranslateActivity extends AppCompatActivity {
             public void onError(Throwable error) {
                 progress.dismiss();
                 Log.e("exception", error.getMessage(), error);
-                Toast.makeText(TranslateActivity.this, "Não foi possível salvar os dados no dispositivo", Toast.LENGTH_LONG).show();
+                Toast.makeText(TranslateActivity.this, getString(R.string.save_message_excption), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    private List<Resource> getResourcesList() {
+        RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);
 
-
-    private List<Resource> getResourcesList(int index) {
-        //int limit =  index == 0 ? 10 : 10 + index - 1;
-        RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);//.between("id", index, limit);
-        List<Resource> resourceList = resourceRealmQuery.findAll();
-
-        return resourceList;
+        return resourceRealmQuery.findAll();
     }
 
     private List<String> getLanguages(){
-        RealmResults<Resource> resourceRealmResults = realm.where(Resource.class).distinct("resourceId");
+        RealmResults<Resource> resourceRealmResults = realm.where(Resource.class).distinct("languageId");
         List<String> languageList = new ArrayList<>();
         for(Resource resources : resourceRealmResults){
             languageList.add(resources.getLanguageId());
@@ -251,9 +211,10 @@ public class TranslateActivity extends AppCompatActivity {
         return modueleList;
     }
 
-    private List<Resource> searchValue(String search, String language, String module){
+    private List<Resource> searchValue(String search, String language, String module, ProgressDialog progress){
         RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
                 .like("value", search);
+        progress.dismiss();
         return resourceRealmResults.findAll();
     }
 
@@ -280,7 +241,11 @@ public class TranslateActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchValue(query, queryLanguage, queryModule);
+                ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
+                progress.setCancelable(false);
+                List<Resource> resourceList = searchValue(query, queryLanguage, queryModule, progress);
+                infiteScrollList(resourceList);
+
                 return false;
             }
 
@@ -289,7 +254,6 @@ public class TranslateActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
 
     @Override
@@ -297,21 +261,25 @@ public class TranslateActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         if (id == R.id.action_language_module) {
-            filterLanguageAndModule();
+            List<String> languages = getLanguages();
+            List<String> modules = getModule();
+            filterLanguageAndModule(languages, modules);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void filterLanguageAndModule(){
+    private void filterLanguageAndModule(final List<String> languages, final List<String> modules){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = layoutInflater.inflate(R.layout.activity_filter_language_module, null);
 
         builder.setTitle(R.string.filter_title)
                 .setMessage(R.string.filter_message)
                 .setIcon(R.drawable.filter)
-                .setView(R.layout.activity_filter_language_module)
+                .setView(dialogView)
                 .setCancelable(false)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -319,6 +287,41 @@ public class TranslateActivity extends AppCompatActivity {
                     }
                 });
 
+        Spinner languageSpinner = (Spinner) dialogView.findViewById(R.id.spinerLanguage);
+        ArrayAdapter<String> languageAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, languages);
+        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        languageSpinner.setAdapter(languageAdapter);
+        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                queryLanguage = languages.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        Spinner moduleSpinner = (Spinner) dialogView.findViewById(R.id.spinerModule);
+        ArrayAdapter<String> moduleAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, modules);
+        moduleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        moduleSpinner.setAdapter(moduleAdapter);
+        moduleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                queryModule = modules.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         builder.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

@@ -11,4 +11,11 @@
     <string name="filter_message">Selecione o idioma e o Módulo para realizar as buscas</string>
 
     <string name="ok">Ok</string>
+
+    <string name="wait_request">Aguarde</string>
+    <string name="request_message">Carregando os dados...</string>
+    <string name="request_message_excption">Não foi possivel carregar os dados</string>
+    <string name="save_message">Salvandos os dados no dispositivo...</string>
+    <string name="save_message_excption">Não foi possível salvar os dados no dispositivo</string>
+
 </resources>
