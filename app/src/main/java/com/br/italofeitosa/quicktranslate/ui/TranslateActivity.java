@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +52,9 @@ import retrofit2.Response;
  */
 public class TranslateActivity extends AppCompatActivity {
 
+    private static final String LANGUAGE_PREFERENCE = "language";
+    private static final String MODULE_PREFERENCE = "module";
+
     @Inject
     ResourceService mResourceService;
 
@@ -59,6 +63,9 @@ public class TranslateActivity extends AppCompatActivity {
 
     @Inject
     Gson gson;
+
+    @Inject
+    SharedPreferences preferences;
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
@@ -69,10 +76,6 @@ public class TranslateActivity extends AppCompatActivity {
     private SearchView searchView;
 
     private List<Resource> resourceList;
-
-    private String queryLanguage;
-
-    private String queryModule;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +214,9 @@ public class TranslateActivity extends AppCompatActivity {
         return modueleList;
     }
 
-    private List<Resource> searchValue(String search, String language, String module, ProgressDialog progress){
+    private List<Resource> searchValue(String search, ProgressDialog progress){
+        String language = preferences.getString(LANGUAGE_PREFERENCE, "");
+        String module = preferences.getString(MODULE_PREFERENCE, "");
         RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
                 .like("value", search);
         progress.dismiss();
@@ -243,7 +248,7 @@ public class TranslateActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
                 progress.setCancelable(false);
-                List<Resource> resourceList = searchValue(query, queryLanguage, queryModule, progress);
+                List<Resource> resourceList = searchValue(query, progress);
                 infiteScrollList(resourceList);
 
                 return false;
@@ -283,7 +288,7 @@ public class TranslateActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        dialog.dismiss();
                     }
                 });
 
@@ -291,11 +296,13 @@ public class TranslateActivity extends AppCompatActivity {
         ArrayAdapter<String> languageAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, languages);
         languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter(languageAdapter);
+        int positionLanguage = languageAdapter.getPosition(preferences.getString(LANGUAGE_PREFERENCE, ""));
+        languageSpinner.setSelection(positionLanguage);
         languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                queryLanguage = languages.get(position);
+                preferences.edit().putString(LANGUAGE_PREFERENCE, languages.get(position) != null ? languages.get(position): "").apply();
             }
 
             @Override
@@ -306,11 +313,14 @@ public class TranslateActivity extends AppCompatActivity {
         ArrayAdapter<String> moduleAdapter = new ArrayAdapter<>(getApplication(), R.layout.spinner_item, modules);
         moduleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         moduleSpinner.setAdapter(moduleAdapter);
+        int positionModule = moduleAdapter.getPosition(preferences.getString(MODULE_PREFERENCE, ""));
+        moduleSpinner.setSelection(positionModule);
+
         moduleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                queryModule = modules.get(position);
+                preferences.edit().putString(MODULE_PREFERENCE, modules.get(position) != null ? modules.get(position): "").apply();
             }
 
             @Override
