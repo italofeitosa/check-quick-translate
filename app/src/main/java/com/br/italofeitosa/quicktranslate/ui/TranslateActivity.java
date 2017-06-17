@@ -176,6 +176,7 @@ public class TranslateActivity extends AppCompatActivity {
         }, new Realm.Transaction.OnSuccess() {
             @Override
             public void onSuccess() {
+                infiteScrollList(getResourcesList());
                 progress.dismiss();
             }
         }, new Realm.Transaction.OnError() {
@@ -219,6 +220,14 @@ public class TranslateActivity extends AppCompatActivity {
         String module = preferences.getString(MODULE_PREFERENCE, "");
         RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
                 .like("value", search);
+        progress.dismiss();
+        return resourceRealmResults.findAll();
+    }
+
+    private List<Resource> getFromFilter(ProgressDialog progress){
+        String language = preferences.getString(LANGUAGE_PREFERENCE, "");
+        String module = preferences.getString(MODULE_PREFERENCE, "");
+        RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module);
         progress.dismiss();
         return resourceRealmResults.findAll();
     }
@@ -288,6 +297,10 @@ public class TranslateActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
+                        progress.setCancelable(false);
+                        List<Resource>resourceList = getFromFilter(progress);
+                        infiteScrollList(resourceList);
                         dialog.dismiss();
                     }
                 });
