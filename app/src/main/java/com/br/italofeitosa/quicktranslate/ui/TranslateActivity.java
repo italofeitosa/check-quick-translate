@@ -199,13 +199,14 @@ public class TranslateActivity extends AppCompatActivity {
         if(!Objects.equals(language, "") && !Objects.equals(module, "")){
             return getFromFilter(progress);
         } else {
-            return getResourcesList();
+            return getResourcesList(progress);
         }
     }
 
-    private List<Resource> getResourcesList() {
+    private List<Resource> getResourcesList(ProgressDialog progress) {
 
         RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);
+        progress.dismiss();
         return resourceRealmQuery.findAll();
     }
 
