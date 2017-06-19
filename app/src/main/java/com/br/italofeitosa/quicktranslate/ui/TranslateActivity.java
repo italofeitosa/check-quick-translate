@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -102,35 +103,12 @@ public class TranslateActivity extends AppCompatActivity {
         infiteScrollList(resourceList);
     }
 
-
     private void infiteScrollList(List<Resource> resources){
 
         ResourceAdapter adapter = new ResourceAdapter(resources);
         recyclerView.setAdapter(adapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-
-        /*InfiniteRecyclerViewScrollListener scrollListener = new InfiniteRecyclerViewScrollListener(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                final ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
-                progress.setCancelable(false);
-                List<Resource> moreResource = resourceList.subList(totalItemsCount,totalItemsCount + 10); //getResourcesList(resourceList.size());
-                final int curSize = adapter.getItemCount();
-                resourceList.addAll(moreResource);
-
-                view.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.dismiss();
-                        adapter.notifyItemRangeInserted(curSize, resourceList.size() - 1);
-                    }
-                });
-            }
-        };*/
-
-        //recyclerView.addOnScrollListener(scrollListener);
-
     }
 
     private void requestJsonResources (){
@@ -163,7 +141,6 @@ public class TranslateActivity extends AppCompatActivity {
             }
         });
     }
-
 
     void saveResourceLocal(final List<ResourceTO> resourceTOList, final ProgressDialog progress) {
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -254,21 +231,21 @@ public class TranslateActivity extends AppCompatActivity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_translate, menu);
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
 
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-        searchView.setSubmitButtonEnabled(true);
 
-        setupSearchView();
+        setupSearchView(searchMenuItem);
 
         return true;
     }
 
-    private void setupSearchView(){
+    private void setupSearchView(MenuItem searchMenuItem){
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -281,8 +258,19 @@ public class TranslateActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public boolean onQueryTextChange(String newText) { return false; }
+        });
+
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) { return true; }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
+                progress.setCancelable(false);
+                infiteScrollList(queryResources(progress));
+                return true;
             }
         });
     }
@@ -358,10 +346,5 @@ public class TranslateActivity extends AppCompatActivity {
         });
 
         builder.show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 }
