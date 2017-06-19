@@ -242,7 +242,7 @@ public class TranslateActivity extends AppCompatActivity {
         String language = preferences.getString(LANGUAGE_PREFERENCE, "");
         String module = preferences.getString(MODULE_PREFERENCE, "");
         RealmResults<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
-                .like("value", search).findAll();
+                .contains("value", search).findAll();
         progress.dismiss();
         return resourceRealmResults;
     }
