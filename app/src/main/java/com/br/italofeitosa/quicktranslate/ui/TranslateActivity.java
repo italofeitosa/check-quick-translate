@@ -35,6 +35,7 @@ import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -75,7 +76,7 @@ public class TranslateActivity extends AppCompatActivity {
 
     private SearchView searchView;
 
-    private List<Resource> resourceList;
+    protected List<Resource> resourceList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,9 @@ public class TranslateActivity extends AppCompatActivity {
             }
         });
 
-        resourceList = getResourcesList();
+        ProgressDialog progress = ProgressDialog.show(TranslateActivity.this, getString(R.string.wait_request), getString(R.string.request_message), true);
+        progress.setCancelable(false);
+        resourceList = queryResources(progress);
 
         infiteScrollList(resourceList);
     }
@@ -176,7 +179,8 @@ public class TranslateActivity extends AppCompatActivity {
         }, new Realm.Transaction.OnSuccess() {
             @Override
             public void onSuccess() {
-                infiteScrollList(getResourcesList());
+                List<Resource> resourceList = queryResources(progress);
+                    infiteScrollList(resourceList);
                 progress.dismiss();
             }
         }, new Realm.Transaction.OnError() {
@@ -189,10 +193,28 @@ public class TranslateActivity extends AppCompatActivity {
         });
     }
 
-    private List<Resource> getResourcesList() {
-        RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);
+    private List<Resource> queryResources(ProgressDialog progress){
+        String language = preferences.getString(LANGUAGE_PREFERENCE, "");
+        String module = preferences.getString(MODULE_PREFERENCE, "");
+        if(!Objects.equals(language, "") && !Objects.equals(module, "")){
+            return getFromFilter(progress);
+        } else {
+            return getResourcesList();
+        }
+    }
 
+    private List<Resource> getResourcesList() {
+
+        RealmQuery<Resource> resourceRealmQuery = realm.where(Resource.class);
         return resourceRealmQuery.findAll();
+    }
+
+    private List<Resource> getFromFilter(ProgressDialog progress){
+        String language = preferences.getString(LANGUAGE_PREFERENCE, "");
+        String module = preferences.getString(MODULE_PREFERENCE, "");
+        RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module);
+        progress.dismiss();
+        return resourceRealmResults.findAll();
     }
 
     private List<String> getLanguages(){
@@ -218,18 +240,10 @@ public class TranslateActivity extends AppCompatActivity {
     private List<Resource> searchValue(String search, ProgressDialog progress){
         String language = preferences.getString(LANGUAGE_PREFERENCE, "");
         String module = preferences.getString(MODULE_PREFERENCE, "");
-        RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
-                .like("value", search);
+        RealmResults<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
+                .like("value", search).findAll();
         progress.dismiss();
-        return resourceRealmResults.findAll();
-    }
-
-    private List<Resource> getFromFilter(ProgressDialog progress){
-        String language = preferences.getString(LANGUAGE_PREFERENCE, "");
-        String module = preferences.getString(MODULE_PREFERENCE, "");
-        RealmQuery<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module);
-        progress.dismiss();
-        return resourceRealmResults.findAll();
+        return resourceRealmResults;
     }
 
     @Override

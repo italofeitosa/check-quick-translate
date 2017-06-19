@@ -60,13 +60,13 @@ public class ResourceAdapter extends  RecyclerView.Adapter<ResourceAdapter.ViewH
         Resource resource = mResources.get(position);
 
         TextView resourceTextView = viewHolder.resourceTextView;
-        resourceTextView.setText(resource.getResourceId());
+        resourceTextView.setText(resource.getResourceId() != null ? resource.getResourceId() : "");
 
         TextView updateTextView = viewHolder.updateTextView;
-        updateTextView.setText(resource.getUpdatedAt().toString());
+        updateTextView.setText(resource.getUpdatedAt() != null ? resource.getUpdatedAt() : "");
 
         TextView valueTextView = viewHolder.valueTextView;
-        valueTextView.setText(resource.getValue());
+        valueTextView.setText(resource.getValue() != null ? resource.getValue() : "");
 
     }
 
