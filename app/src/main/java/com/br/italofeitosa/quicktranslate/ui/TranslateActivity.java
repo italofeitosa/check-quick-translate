@@ -41,6 +41,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -239,10 +240,11 @@ public class TranslateActivity extends AppCompatActivity {
     }
 
     private List<Resource> searchValue(String search, ProgressDialog progress){
+
         String language = preferences.getString(LANGUAGE_PREFERENCE, "");
         String module = preferences.getString(MODULE_PREFERENCE, "");
         RealmResults<Resource> resourceRealmResults = realm.where(Resource.class).equalTo("languageId", language).equalTo("moduleId",module)
-                .contains("value", search).findAll();
+                .contains("value", search, Case.INSENSITIVE).findAll();
         progress.dismiss();
         return resourceRealmResults;
     }
