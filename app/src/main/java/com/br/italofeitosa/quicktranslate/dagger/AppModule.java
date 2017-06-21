@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.br.italofeitosa.quicktranslate.Application;
+import com.br.italofeitosa.quicktranslate.repository.ResourceRepository;
+import com.br.italofeitosa.quicktranslate.repository.impl.ResourceRepositoryImpl;
 
 import javax.inject.Singleton;
 
@@ -37,5 +39,11 @@ public class AppModule {
     @Singleton
     SharedPreferences provideSharedPreferences() {
         return application.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+    }
+
+    @Provides
+    @Singleton
+    ResourceRepository provideResourceRepository(Realm realm){
+        return new ResourceRepositoryImpl(realm);
     }
 }
